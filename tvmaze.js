@@ -4,7 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const BASE_URL = "http://api.tvmaze.com/";
-const DEFAULT_IMAGE_URL = "";
+const DEFAULT_IMAGE_URL = "https://tinyurl.com/tv-missing";
 const EPISODES_ENDPOINT = "search/shows";
 // const SHOWS_ENDPOINT = `shows/${show_id}/episodes`;
 
@@ -29,11 +29,15 @@ function parseShows(shows) {
   let parsedShows = [];
   for (let i of shows) {
     let show = i["show"];
-    // console.log("SHOW:",show);
-    let { id, name, summary, image } = show;
+    //Find image URL, denest from nested object show. If one does not exist, use default
+    let image = show.image;
     if (image === null) {
       image = DEFAULT_IMAGE_URL;
+    } else {
+      image = image.medium;
     }
+    
+    let { id, name, summary } = show;
     parsedShows.push({ id, name, summary, image });
   }
   return parsedShows;
@@ -43,10 +47,10 @@ function parseShows(shows) {
 function populateShows(shows) {
   $showsList.empty();
   console.log(shows);
+  
   for (let show of shows) {
-
-
-    // $showsList.append($show);
+    let showImage = $('<img>').attr('src', show.image);
+    $showsList.append(showImage);
   }
 }
 
