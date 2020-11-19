@@ -27,8 +27,8 @@ async function getShowsByTerm(searchTerm) {
  */
 function parseShows(shows) {
   let parsedShows = [];
-  for (let i of shows) {
-    let show = i["show"];
+  for (let showObject of shows) {
+    let show = showObject["show"];
     //Find image URL, denest from nested object show. If one does not exist, use default
     let image = show.image;
     if (image === null) {
@@ -36,8 +36,10 @@ function parseShows(shows) {
     } else {
       image = image.medium;
     }
-    
     let { id, name, summary } = show;
+    if (show.summary.length<1){
+      summary = `There was no summary provided for this show.`
+    }
     parsedShows.push({ id, name, summary, image });
   }
   return parsedShows;
@@ -47,13 +49,51 @@ function parseShows(shows) {
 function populateShows(shows) {
   $showsList.empty();
   console.log(shows);
-  
+
   for (let show of shows) {
-    let showImage = $('<img>').attr('src', show.image);
-    $showsList.append(showImage);
+    // console.log("Show:",show)
+    let mediaDiv = $("<div>").addClass(["media", "mb-1"])
+    $showsList.append(mediaDiv);
+    let showImage =
+      $('<img>')
+        .attr('src', show.image)
+        .addClass(["w-25", "m-4"]);
+    let title =
+      $("<h5>")
+        .text(show["name"])
+        .addClass("text-primary");
+    let summary = $("<p>").html(show["summary"])
+    let mediaBody = $("<div>")
+      .addClass("media-body")
+      .append(title)
+      .append(summary);
+    mediaDiv
+      .append(showImage)
+      .append(mediaBody);
+
   }
 }
 
+{/* <div data-show-id="1767" class="Show col-md-12 col-lg-6 mb-4">
+         //<div class="media">
+           //<img src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg" alt="Bletchly Circle San Francisco" class="w-25 mr-3">
+           <div class="media-body">
+             <h5 class="text-primary">The Bletchley Circle</h5>
+             <div><small><p><b>The Bletchley Circle</b> follows the journey of four ordinary
+           women with extraordinary skills that helped to end World War II.</p>
+         <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their
+           normal lives, modestly setting aside the part they played in
+           producing crucial intelligence, which helped the Allies to victory
+           and shortened the war. When Susan discovers a hidden code behind an
+           unsolved murder she is met by skepticism from the police. She
+           quickly realises she can only begin to crack the murders and bring
+           the culprit to justice with her former friends.</p></small></div>
+             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+               Episodes
+             </button>
+           </div>
+         </div>
+       </div> */}
 
 /** Handle search form submission: get shows from API and display.
  *    Hide episodes area (that only gets shown if they ask for episodes)
